@@ -11,6 +11,7 @@ var (
 	ErrEmailTaken     = errors.New("email taken")
 	ErrGenAccessToken = errors.New("generate access token error")
 	ErrNotFound       = errors.New("not found")
+	ErrValidation     = errors.New("validation error")
 )
 
 type UserRepo interface {
@@ -29,7 +30,3 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
-
-var (
-	ErrValidation = errors.New("validation error")
-)
