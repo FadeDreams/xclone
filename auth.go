@@ -3,7 +3,7 @@ package xclone
 import (
 	"context"
 	"fmt"
-	// "net/http"
+	"net/http"
 	"regexp"
 	"strings"
 )
@@ -20,21 +20,28 @@ type AuthService interface {
 	Login(ctx context.Context, input LoginInput) (AuthResponse, error)
 }
 
-type RegisterInput struct {
-	Email           string
-	Username        string
-	Password        string
-	ConfirmPassword string
+type AuthTokenService interface {
+	CreateAccessToken(ctx context.Context, user User) (string, error)
+	CreateRefreshToken(ctx context.Context, user User, tokenID string) (string, error)
+	ParseToken(ctx context.Context, payload string) (AuthToken, error)
+	ParseTokenFromRequest(ctx context.Context, r *http.Request) (AuthToken, error)
 }
 
-type LoginInput struct {
-	Email    string
-	Password string
+type AuthToken struct {
+	ID  string
+	Sub string
 }
 
 type AuthResponse struct {
 	AccessToken string
 	User        User
+}
+
+type RegisterInput struct {
+	Email           string
+	Username        string
+	Password        string
+	ConfirmPassword string
 }
 
 func (in *RegisterInput) Sanitize() {
@@ -59,6 +66,28 @@ func (in RegisterInput) Validate() error {
 
 	if in.Password != in.ConfirmPassword {
 		return fmt.Errorf("%w: confirm password must match the password", ErrValidation)
+	}
+
+	return nil
+}
+
+type LoginInput struct {
+	Email    string
+	Password string
+}
+
+func (in *LoginInput) Sanitize() {
+	in.Email = strings.TrimSpace(in.Email)
+	in.Email = strings.ToLower(in.Email)
+}
+
+func (in LoginInput) Validate() error {
+	if !emailRegexp.MatchString(in.Email) {
+		return fmt.Errorf("%w: email not valid", ErrValidation)
+	}
+
+	if len(in.Password) < 1 {
+		return fmt.Errorf("%w: password required", ErrValidation)
 	}
 
 	return nil
