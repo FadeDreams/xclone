@@ -1,11 +1,24 @@
 package xclone
 
 import (
+	"context"
 	"errors"
 	"time"
 )
 
+var (
+	ErrUsernameTaken  = errors.New("username taken")
+	ErrEmailTaken     = errors.New("email taken")
+	ErrGenAccessToken = errors.New("generate access token error")
+	ErrNotFound       = errors.New("not found")
+)
+
 type UserRepo interface {
+	Create(ctx context.Context, user User) (User, error)
+	GetByUsername(ctx context.Context, username string) (User, error)
+	GetByEmail(ctx context.Context, email string) (User, error)
+	GetByID(ctx context.Context, id string) (User, error)
+	GetByIds(ctx context.Context, ids []string) ([]User, error)
 }
 
 type User struct {
