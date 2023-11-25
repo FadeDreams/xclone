@@ -69,3 +69,35 @@ func (as *AuthService) Register(ctx context.Context, input xclone.RegisterInput)
 		User:        user,
 	}, nil
 }
+
+func (as *AuthService) Login(ctx context.Context, input xclone.LoginInput) (xclone.AuthResponse, error) {
+	input.Sanitize()
+
+	if err := input.Validate(); err != nil {
+		return xclone.AuthResponse{}, err
+	}
+
+	user, err := as.UserRepo.GetByEmail(ctx, input.Email)
+	if err != nil {
+		switch {
+		case errors.Is(err, xclone.ErrNotFound):
+			return xclone.AuthResponse{}, xclone.ErrBadCredentials
+		default:
+			return xclone.AuthResponse{}, err
+		}
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
+		return xclone.AuthResponse{}, xclone.ErrBadCredentials
+	}
+
+	accessToken, err := as.AuthTokenService.CreateAccessToken(ctx, user)
+	if err != nil {
+		return xclone.AuthResponse{}, xclone.ErrGenAccessToken
+	}
+
+	return xclone.AuthResponse{
+		AccessToken: accessToken,
+		User:        user,
+	}, nil
+}

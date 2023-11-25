@@ -12,6 +12,7 @@ var (
 	ErrGenAccessToken = errors.New("generate access token error")
 	ErrNotFound       = errors.New("not found")
 	ErrValidation     = errors.New("validation error")
+	ErrBadCredentials = errors.New("email/password wrong combination")
 )
 
 type UserRepo interface {
