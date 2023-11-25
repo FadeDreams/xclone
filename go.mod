@@ -3,6 +3,7 @@ module github.com/fadedreams/xclone
 go 1.21.4
 
 require (
+	github.com/google/uuid v1.4.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.15.0
 )
