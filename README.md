@@ -1,3 +1,4 @@
 ### to test the app
 - brew install mockery
-- go run ./domain
+- go test ./domain -v
+-
