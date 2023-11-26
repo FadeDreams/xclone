@@ -1,8 +1,8 @@
 let SessionLoad = 1
 let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
-let NetrwMenuPriority =  80 
 let NetrwTopLvlMenu = "Netrw."
+let NetrwMenuPriority =  80 
 silent only
 silent tabonly
 cd ~/goprj/xclone
@@ -16,14 +16,12 @@ else
   set shortmess=aoO
 endif
 badd +1 ~/goprj/xclone
-badd +11 postgres/postgres.go
-badd +5 config/config.go
+badd +33 domain/domain_integration_test.go
 argglobal
 %argdel
 $argadd ~/goprj/xclone
-edit postgres/postgres.go
+edit domain/domain_integration_test.go
 argglobal
-balt config/config.go
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -32,13 +30,13 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-19
+27
 normal! zo
-let s:l = 11 - ((10 * winheight(0) + 11) / 22)
+let s:l = 33 - ((17 * winheight(0) + 15) / 30)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 11
+keepjumps 33
 normal! 0
 lcd ~/goprj/xclone
 tabnext 1
