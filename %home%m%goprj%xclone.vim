@@ -16,11 +16,17 @@ else
   set shortmess=aoO
 endif
 badd +1 ~/goprj/xclone
-badd +33 domain/domain_integration_test.go
 argglobal
 %argdel
 $argadd ~/goprj/xclone
-edit domain/domain_integration_test.go
+edit postgres/user_repo.go
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
 argglobal
 setlocal fdm=indent
 setlocal fde=0
@@ -30,13 +36,11 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-27
-normal! zo
-let s:l = 33 - ((17 * winheight(0) + 15) / 30)
+let s:l = 108 - ((23 * winheight(0) + 15) / 31)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 33
+keepjumps 108
 normal! 0
 lcd ~/goprj/xclone
 tabnext 1
@@ -46,6 +50,8 @@ endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20
 let &shortmess = s:shortmess_save
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
