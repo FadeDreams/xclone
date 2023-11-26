@@ -15,9 +15,36 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/fadedreams/xclone"
+	"github.com/fadedreams/xclone/domain"
 	"github.com/fadedreams/xclone/graph"
 )
 
+type EmptyAuthTokenService struct{}
+
+func (s *EmptyAuthTokenService) CreateAccessToken(ctx context.Context, user xclone.User) (string, error) {
+	// Implement the logic to create an access token here.
+	// This can be a placeholder or an empty implementation depending on your needs.
+	return "sample_access_token", nil
+}
+
+func (s *EmptyAuthTokenService) CreateRefreshToken(ctx context.Context, user xclone.User, tokenID string) (string, error) {
+	// Implement the logic to create a refresh token here.
+	// This can be a placeholder or an empty implementation depending on your needs.
+	return "sample_refresh_token", nil
+}
+
+func (s *EmptyAuthTokenService) ParseToken(ctx context.Context, payload string) (xclone.AuthToken, error) {
+	// Implement the logic to parse a token here.
+	// This can be a placeholder or an empty implementation depending on your needs.
+	return xclone.AuthToken{}, nil
+}
+
+func (s *EmptyAuthTokenService) ParseTokenFromRequest(ctx context.Context, r *http.Request) (xclone.AuthToken, error) {
+	// Implement the logic to parse a token from a request here.
+	// This can be a placeholder or an empty implementation depending on your needs.
+	return xclone.AuthToken{}, nil
+}
 func main() {
 	ctx := context.Background()
 
@@ -37,6 +64,10 @@ func main() {
 
 	fmt.Println("Migration success")
 
+	userRepo := postgres.NewUserRepo(db)
+	authTokenService := &EmptyAuthTokenService{}
+	authService := domain.NewAuthService(userRepo, authTokenService)
+
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.RequestID)
@@ -48,7 +79,9 @@ func main() {
 	router.Handle("/query", handler.NewDefaultServer(
 		graph.NewExecutableSchema(
 			graph.Config{
-				Resolvers: &graph.Resolver{},
+				Resolvers: &graph.Resolver{
+					AuthService: authService,
+				},
 			},
 		),
 	))

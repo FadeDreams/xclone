@@ -1,8 +1,8 @@
 let SessionLoad = 1
 let s:so_save = &g:so | let s:siso_save = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1
 let v:this_session=expand("<sfile>:p")
-let NetrwTopLvlMenu = "Netrw."
 let NetrwMenuPriority =  80 
+let NetrwTopLvlMenu = "Netrw."
 silent only
 silent tabonly
 cd ~/goprj/xclone
@@ -16,18 +16,16 @@ else
   set shortmess=aoO
 endif
 badd +1 ~/goprj/xclone
+badd +51 cmd/gserver/main.go
+badd +20 graph/resolver.go
+badd +12 graph/schema.resolvers.go
+badd +18 auth.go
 argglobal
 %argdel
 $argadd ~/goprj/xclone
-edit postgres/user_repo.go
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
+edit graph/schema.resolvers.go
 argglobal
+balt graph/resolver.go
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -36,11 +34,19 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 108 - ((23 * winheight(0) + 15) / 31)
+20
+normal! zo
+27
+normal! zo
+95
+normal! zo
+96
+normal! zo
+let s:l = 90 - ((17 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 108
+keepjumps 90
 normal! 0
 lcd ~/goprj/xclone
 tabnext 1
@@ -50,8 +56,6 @@ endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20
 let &shortmess = s:shortmess_save
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)

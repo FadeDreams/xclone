@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/fadedreams/xclone"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -100,5 +101,4 @@ func (as *AuthService) Login(ctx context.Context, input xclone.LoginInput) (xclo
 		AccessToken: accessToken,
 		User:        user,
 	}, nil
-
 }

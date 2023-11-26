@@ -6,13 +6,37 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
+	// "strconv"
 
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/fadedreams/xclone"
 	"github.com/fadedreams/xclone/graph/model"
+	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // Register is the resolver for the register field.
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.AuthResponse, error) {
+	res, err := r.AuthService.Register(ctx, xclone.RegisterInput{
+		Email:           input.Email,
+		Username:        input.Username,
+		Password:        input.Password,
+		ConfirmPassword: input.ConfirmPassword,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, xclone.ErrValidation) ||
+			errors.Is(err, xclone.ErrEmailTaken) ||
+			errors.Is(err, xclone.ErrUsernameTaken):
+			return nil, buildBadRequestError(ctx, err)
+		default:
+			return nil, err
+		}
+	}
+
+	return mapAuthResponse(res), nil
 	panic(fmt.Errorf("not implemented: Register - register"))
 }
 
@@ -68,3 +92,30 @@ type queryResolver struct{ *Resolver }
 // func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 // 	panic(fmt.Errorf("not implemented: Todos - todos"))
 // }
+
+func buildBadRequestError(ctx context.Context, err error) error {
+	return &gqlerror.Error{
+		Message: err.Error(),
+		Path:    graphql.GetPath(ctx),
+		Extensions: map[string]interface{}{
+			"code": http.StatusBadRequest,
+		},
+	}
+}
+
+func mapAuthResponse(a xclone.AuthResponse) *model.AuthResponse {
+	return &model.AuthResponse{
+		AccessToken: a.AccessToken,
+		User:        mapUser(a.User),
+	}
+}
+
+func mapUser(u xclone.User) *model.User {
+	return &model.User{
+		ID:        u.ID,
+		Email:     u.Email,
+		Username:  u.Username,
+		CreatedAt: u.CreatedAt, // Commented out for testing
+	}
+
+}
