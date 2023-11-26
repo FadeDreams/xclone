@@ -15,24 +15,15 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +10 postgres/postgres.go
-badd +25 cmd/gserver/main.go
-badd +44 docker-compose.yml
-badd +2 postgres/migrations/20231125175416_create_users_table.up.sql
-badd +1 postgres/migrations/20231125175416_create_users_table.down.sql
+badd +1 ~/goprj/xclone
+badd +11 postgres/postgres.go
+badd +5 config/config.go
 argglobal
 %argdel
 $argadd ~/goprj/xclone
-edit postgres/migrations/20231125175416_create_users_table.down.sql
-wincmd t
-let s:save_winminheight = &winminheight
-let s:save_winminwidth = &winminwidth
-set winminheight=0
-set winheight=1
-set winminwidth=0
-set winwidth=1
+edit postgres/postgres.go
 argglobal
-balt postgres/migrations/20231125175416_create_users_table.up.sql
+balt config/config.go
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -41,12 +32,14 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 1 - ((0 * winheight(0) + 15) / 30)
+19
+normal! zo
+let s:l = 11 - ((10 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 1
-normal! 017|
+keepjumps 11
+normal! 0
 lcd ~/goprj/xclone
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
@@ -55,8 +48,6 @@ endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20
 let &shortmess = s:shortmess_save
-let &winminheight = s:save_winminheight
-let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
