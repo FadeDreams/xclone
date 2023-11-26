@@ -14,6 +14,8 @@ var (
 	ErrValidation         = errors.New("validation error")
 	ErrBadCredentials     = errors.New("email/password wrong combination")
 	ErrInvalidAccessToken = errors.New("invalid access token")
+	ErrNoUserIDInContext  = errors.New("no user id in context")
+	ErrUnauthenticated    = errors.New("unauthenticated")
 )
 
 type UserRepo interface {

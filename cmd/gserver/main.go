@@ -18,6 +18,7 @@ import (
 	"github.com/fadedreams/xclone"
 	"github.com/fadedreams/xclone/domain"
 	"github.com/fadedreams/xclone/graph"
+	"github.com/fadedreams/xclone/jwt"
 )
 
 type EmptyAuthTokenService struct{}
@@ -65,7 +66,8 @@ func main() {
 	fmt.Println("Migration success")
 
 	userRepo := postgres.NewUserRepo(db)
-	authTokenService := &EmptyAuthTokenService{}
+	// authTokenService := &EmptyAuthTokenService{}
+	authTokenService := jwt.NewTokenService(conf)
 	authService := domain.NewAuthService(userRepo, authTokenService)
 
 	router := chi.NewRouter()
@@ -75,6 +77,7 @@ func main() {
 	router.Use(middleware.RedirectSlashes)
 	router.Use(middleware.Timeout(time.Second * 60))
 
+	router.Use(authMiddleware(authTokenService))
 	router.Handle("/", playground.Handler("X clone", "/query"))
 	router.Handle("/query", handler.NewDefaultServer(
 		graph.NewExecutableSchema(

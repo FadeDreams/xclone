@@ -42,6 +42,21 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.AuthResponse, error) {
+	res, err := r.AuthService.Login(ctx, xclone.LoginInput{
+		Email:    input.Email,
+		Password: input.Password,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, xclone.ErrValidation) ||
+			errors.Is(err, xclone.ErrBadCredentials):
+			return nil, buildBadRequestError(ctx, err)
+		default:
+			return nil, err
+		}
+	}
+
+	return mapAuthResponse(res), nil
 	panic(fmt.Errorf("not implemented: Login - login"))
 }
 
@@ -62,7 +77,16 @@ func (r *mutationResolver) DeleteTweet(ctx context.Context, id string) (bool, er
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	userID, err := xclone.GetUserIDFromContext(ctx)
+	if err != nil {
+		fmt.Print(err) // Optionally, you can print the error for debugging.
+		return nil, xclone.ErrUnauthenticated
+	}
+
+	return mapUser(xclone.User{
+		ID: userID,
+	}), nil
+	// panic(fmt.Errorf("not implemented: Me - me"))
 }
 
 // Tweets is the resolver for the tweets field.
