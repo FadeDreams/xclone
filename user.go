@@ -7,12 +7,13 @@ import (
 )
 
 var (
-	ErrUsernameTaken  = errors.New("username taken")
-	ErrEmailTaken     = errors.New("email taken")
-	ErrGenAccessToken = errors.New("generate access token error")
-	ErrNotFound       = errors.New("not found")
-	ErrValidation     = errors.New("validation error")
-	ErrBadCredentials = errors.New("email/password wrong combination")
+	ErrUsernameTaken      = errors.New("username taken")
+	ErrEmailTaken         = errors.New("email taken")
+	ErrGenAccessToken     = errors.New("generate access token error")
+	ErrNotFound           = errors.New("not found")
+	ErrValidation         = errors.New("validation error")
+	ErrBadCredentials     = errors.New("email/password wrong combination")
+	ErrInvalidAccessToken = errors.New("invalid access token")
 )
 
 type UserRepo interface {
