@@ -72,6 +72,7 @@ func main() {
 	authTokenService := jwt.NewTokenService(conf)
 	authService := domain.NewAuthService(userRepo, authTokenService)
 	tweetService := domain.NewTweetService(tweetRepo)
+	userService := domain.NewUserService(userRepo)
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -88,6 +89,7 @@ func main() {
 				Resolvers: &graph.Resolver{
 					AuthService:  authService,
 					TweetService: tweetService,
+					UserService:  userService,
 				},
 			},
 		),

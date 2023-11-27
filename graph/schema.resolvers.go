@@ -182,9 +182,10 @@ func (m *mutationResolver) DeleteTweet(ctx context.Context, id string) (bool, er
 	return true, nil
 }
 
-// func (t *tweetResolver) User(ctx context.Context, obj *model.Tweet) (*model.User, error) {
-// 	return DataloaderFor(ctx).UserByID.Load(obj.UserID)
-// }
+func (t *tweetResolver) User(ctx context.Context, obj *model.Tweet) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: User"))
+	// return DataloaderFor(ctx).UserByID.Load(obj.UserID)
+}
 
 func (m *mutationResolver) CreateReply(ctx context.Context, parentID string, input model.CreateTweetInput) (*model.Tweet, error) {
 	tweet, err := m.TweetService.CreateReply(ctx, parentID, xclone.CreateTweetInput{
