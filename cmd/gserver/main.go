@@ -66,9 +66,12 @@ func main() {
 	fmt.Println("Migration success")
 
 	userRepo := postgres.NewUserRepo(db)
+	tweetRepo := postgres.NewTweetRepo(db)
+
 	// authTokenService := &EmptyAuthTokenService{}
 	authTokenService := jwt.NewTokenService(conf)
 	authService := domain.NewAuthService(userRepo, authTokenService)
+	tweetService := domain.NewTweetService(tweetRepo)
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -83,7 +86,8 @@ func main() {
 		graph.NewExecutableSchema(
 			graph.Config{
 				Resolvers: &graph.Resolver{
-					AuthService: authService,
+					AuthService:  authService,
+					TweetService: tweetService,
 				},
 			},
 		),

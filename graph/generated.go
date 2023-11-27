@@ -91,9 +91,15 @@ type MutationResolver interface {
 	CreateReply(ctx context.Context, parentID string, input model.CreateTweetInput) (*model.Tweet, error)
 	DeleteTweet(ctx context.Context, id string) (bool, error)
 }
+
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Tweets(ctx context.Context) ([]*model.Tweet, error)
+}
+
+type TweetResolver interface {
+	User(ctx context.Context, obj *model.Tweet) (*model.User, error)
+	Replies(ctx context.Context, obj *model.Tweet) ([]*model.Tweet, error)
 }
 
 type executableSchema struct {

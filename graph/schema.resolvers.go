@@ -8,13 +8,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
+	// "net/http"
 	// "strconv"
 
-	"github.com/99designs/gqlgen/graphql"
+	// "github.com/99designs/gqlgen/graphql"
 	"github.com/fadedreams/xclone"
 	"github.com/fadedreams/xclone/graph/model"
-	"github.com/vektah/gqlparser/v2/gqlerror"
+	// "github.com/vektah/gqlparser/v2/gqlerror"
 )
 
 // Register is the resolver for the register field.
@@ -61,19 +61,19 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 }
 
 // CreateTweet is the resolver for the createTweet field.
-func (r *mutationResolver) CreateTweet(ctx context.Context, input model.CreateTweetInput) (*model.Tweet, error) {
-	panic(fmt.Errorf("not implemented: CreateTweet - createTweet"))
-}
+// func (r *mutationResolver) CreateTweet(ctx context.Context, input model.CreateTweetInput) (*model.Tweet, error) {
+// 	panic(fmt.Errorf("not implemented: CreateTweet - createTweet"))
+// }
 
 // CreateReply is the resolver for the createReply field.
-func (r *mutationResolver) CreateReply(ctx context.Context, parentID string, input model.CreateTweetInput) (*model.Tweet, error) {
-	panic(fmt.Errorf("not implemented: CreateReply - createReply"))
-}
+// func (r *mutationResolver) CreateReply(ctx context.Context, parentID string, input model.CreateTweetInput) (*model.Tweet, error) {
+// 	panic(fmt.Errorf("not implemented: CreateReply - createReply"))
+// }
 
 // DeleteTweet is the resolver for the deleteTweet field.
-func (r *mutationResolver) DeleteTweet(ctx context.Context, id string) (bool, error) {
-	panic(fmt.Errorf("not implemented: DeleteTweet - deleteTweet"))
-}
+// func (r *mutationResolver) DeleteTweet(ctx context.Context, id string) (bool, error) {
+// 	panic(fmt.Errorf("not implemented: DeleteTweet - deleteTweet"))
+// }
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
@@ -90,9 +90,9 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 }
 
 // Tweets is the resolver for the tweets field.
-func (r *queryResolver) Tweets(ctx context.Context) ([]*model.Tweet, error) {
-	panic(fmt.Errorf("not implemented: Tweets - tweets"))
-}
+// func (r *queryResolver) Tweets(ctx context.Context) ([]*model.Tweet, error) {
+// 	panic(fmt.Errorf("not implemented: Tweets - tweets"))
+// }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -117,16 +117,6 @@ type queryResolver struct{ *Resolver }
 // 	panic(fmt.Errorf("not implemented: Todos - todos"))
 // }
 
-func buildBadRequestError(ctx context.Context, err error) error {
-	return &gqlerror.Error{
-		Message: err.Error(),
-		Path:    graphql.GetPath(ctx),
-		Extensions: map[string]interface{}{
-			"code": http.StatusBadRequest,
-		},
-	}
-}
-
 func mapAuthResponse(a xclone.AuthResponse) *model.AuthResponse {
 	return &model.AuthResponse{
 		AccessToken: a.AccessToken,
@@ -142,4 +132,76 @@ func mapUser(u xclone.User) *model.User {
 		CreatedAt: u.CreatedAt, // Commented out for testing
 	}
 
+}
+
+// ////////////////tweets/////////////////////
+func mapTweet(t xclone.Tweet) *model.Tweet {
+	return &model.Tweet{
+		ID:        t.ID,
+		Body:      t.Body,
+		UserID:    t.UserID,
+		CreatedAt: t.CreatedAt,
+	}
+}
+
+func mapTweets(tweets []xclone.Tweet) []*model.Tweet {
+	tt := make([]*model.Tweet, len(tweets))
+
+	for i, t := range tweets {
+		tt[i] = mapTweet(t)
+	}
+
+	return tt
+}
+
+func (q *queryResolver) Tweets(ctx context.Context) ([]*model.Tweet, error) {
+	tweets, err := q.TweetService.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return mapTweets(tweets), nil
+}
+
+func (m *mutationResolver) CreateTweet(ctx context.Context, input model.CreateTweetInput) (*model.Tweet, error) {
+	tweet, err := m.TweetService.Create(ctx, xclone.CreateTweetInput{
+		Body: input.Body,
+	})
+	if err != nil {
+		return nil, buildError(ctx, err)
+	}
+
+	return mapTweet(tweet), nil
+}
+
+func (m *mutationResolver) DeleteTweet(ctx context.Context, id string) (bool, error) {
+	if err := m.TweetService.Delete(ctx, id); err != nil {
+		return false, buildError(ctx, err)
+	}
+
+	return true, nil
+}
+
+// func (t *tweetResolver) User(ctx context.Context, obj *model.Tweet) (*model.User, error) {
+// 	return DataloaderFor(ctx).UserByID.Load(obj.UserID)
+// }
+
+func (m *mutationResolver) CreateReply(ctx context.Context, parentID string, input model.CreateTweetInput) (*model.Tweet, error) {
+	tweet, err := m.TweetService.CreateReply(ctx, parentID, xclone.CreateTweetInput{
+		Body: input.Body,
+	})
+	if err != nil {
+		return nil, buildError(ctx, err)
+	}
+
+	return mapTweet(tweet), nil
+}
+
+func (t *tweetResolver) Replies(ctx context.Context, obj *model.Tweet) ([]*model.Tweet, error) {
+	tweets, err := t.TweetService.GetByParentID(ctx, obj.ID)
+	if err != nil {
+		return nil, buildError(ctx, err)
+	}
+
+	return mapTweets(tweets), nil
 }
