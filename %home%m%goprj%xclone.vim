@@ -16,16 +16,22 @@ else
   set shortmess=aoO
 endif
 badd +1 ~/goprj/xclone
-badd +51 cmd/gserver/main.go
-badd +20 graph/resolver.go
-badd +12 graph/schema.resolvers.go
-badd +18 auth.go
+badd +36 config/config.go
+badd +32 auth.go
+badd +28 refresh_token.go
+badd +1 jwt/jwt.go
 argglobal
 %argdel
 $argadd ~/goprj/xclone
-edit graph/schema.resolvers.go
+edit jwt/jwt.go
+wincmd t
+let s:save_winminheight = &winminheight
+let s:save_winminwidth = &winminwidth
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
 argglobal
-balt graph/resolver.go
 setlocal fdm=indent
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -34,20 +40,18 @@ setlocal fdl=99
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-20
+30
 normal! zo
-27
+51
 normal! zo
-95
+65
 normal! zo
-96
-normal! zo
-let s:l = 90 - ((17 * winheight(0) + 11) / 22)
+let s:l = 1 - ((0 * winheight(0) + 15) / 30)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 90
-normal! 0
+keepjumps 1
+normal! 03|
 lcd ~/goprj/xclone
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
@@ -56,13 +60,14 @@ endif
 unlet! s:wipebuf
 set winheight=1 winwidth=20
 let &shortmess = s:shortmess_save
+let &winminheight = s:save_winminheight
+let &winminwidth = s:save_winminwidth
 let s:sx = expand("<sfile>:p:r")."x.vim"
 if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
 set hlsearch
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

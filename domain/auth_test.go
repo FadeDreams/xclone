@@ -33,7 +33,7 @@ func TestAuthService_Register(t *testing.T) {
 
 		userRepo.On("Create", mock.Anything, mock.Anything).
 			Return(xclone.User{
-				ID:       123,
+				ID:       "123",
 				Username: validInput.Username,
 				Email:    validInput.Email,
 			}, nil)
@@ -161,7 +161,7 @@ func TestAuthService_Register(t *testing.T) {
 
 		userRepo.On("Create", mock.Anything, mock.Anything).
 			Return(xclone.User{
-				ID:       123,
+				ID:       "123",
 				Username: validInput.Username,
 				Email:    validInput.Email,
 			}, nil)
